@@ -1,6 +1,6 @@
 # Where DeckCraft falls short of PowerPoint
 
-> **Last reviewed:** 2026-10-14 · **Last updated:** 2026-10-22 · **Change:** minor (Animation Pane ▸ Play From; previous: minor, native chart payloads stored in bounded ZIP members; previous: major, community PR wave 2026-10-14: soak tests, PPTX corpus, comment threads (#70), embedded fonts, SmartArt Text Pane, Animation Pane timeline, Hunspell spelling, thesaurus, AutoCorrect, 14 new dialogs, pen pressure and trackpad gestures; duplicated entries and headers folded; previous: minor, 3-D bevel, camera and face lighting rendered) · **Target:** Microsoft PowerPoint for Mac 16.113 (Microsoft 365)
+> **Last reviewed:** 2026-10-14 · **Last updated:** 2026-10-28 · **Change:** trivial (Reuse Slides picker shows thumbnails; previous: minor, Animation Pane ▸ Play From; previous: minor, native chart payloads stored in bounded ZIP members; previous: major, community PR wave 2026-10-14: soak tests, PPTX corpus, comment threads (#70), embedded fonts, SmartArt Text Pane, Animation Pane timeline, Hunspell spelling, thesaurus, AutoCorrect, 14 new dialogs, pen pressure and trackpad gestures; duplicated entries and headers folded; previous: minor, 3-D bevel, camera and face lighting rendered) · **Target:** Microsoft PowerPoint for Mac 16.113 (Microsoft 365)
 > **Last reviewed:** 2026-10-14 · **Last updated:** 2026-10-20 · **Change:** trivial (empty chart number-format sections hide values; previous: minor, native chart payloads stored in bounded ZIP members; previous: major, community PR wave 2026-10-14: soak tests, PPTX corpus, comment threads (#70), embedded fonts, SmartArt Text Pane, Animation Pane timeline, Hunspell spelling, thesaurus, AutoCorrect, 14 new dialogs, pen pressure and trackpad gestures; duplicated entries and headers folded; previous: minor, 3-D bevel, camera and face lighting rendered) · **Target:** Microsoft PowerPoint for Mac 16.113 (Microsoft 365)
 
 Every known shortfall, one entry each, ranked by how much it stops someone who presents with
@@ -285,8 +285,8 @@ and starts at that effect. The pane has an advanced timeline with draggable bars
 
 ### Smaller missing rows
 Zoom: live thumbnails, the zoom-in animation and the native `p166:sldZm` element (3–5 h;
-`insert.zoom` makes linked pictures with Return to Zoom), reuse slides pane with thumbnails
-(1–2 h; `slide.reuse` inserts from a file), laser pointer from the presenter window (1–2 h),
+`insert.zoom` makes linked pictures with Return to Zoom), Reuse Slides as a docked pane
+(1 h; the picker shows thumbnails), laser pointer from the presenter window (1–2 h),
 artistic effects (3–6 h for the other 15 of 22; 7 approximated and round-tripped), remove
 background (6–10 h; needs a model or a classical matte), insert screenshot (2–3 h), record
 audio/screen and record slide show (8–12 h), compare presentations beyond slide-level accept
@@ -372,6 +372,7 @@ Detail in [localization-parity.md](localization-parity.md).
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-10-28 | trivial | Reuse Slides picker shows each slide's thumbnail; the smaller row keeps only a docked pane |
 | 2026-10-25 | trivial | New entries: copying text and cell ranges (no media, no table), a control-server timing test that may fail under load; Proofing notes that automatic lists follow Replace text as you type and that Backspace puts the typed lead back |
 | 2026-10-24 | trivial | AutoFormat starts bulleted and numbered lists as you type (`* `, `-- `, `> `, `1. `, `a) ` and the rest), with an AutoCorrect option to turn it off |
 | 2026-10-22 | minor | Animation Pane ▸ Play From starts the preview at the selected effect; gap 10 keeps the effect gallery (7–13 h) |

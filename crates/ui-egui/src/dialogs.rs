@@ -124,6 +124,9 @@ pub fn show(app: &mut SlideApp, ctx: &egui::Context) {
         back.params = ret;
         app.dialog = Some(back);
     }
+    if app.dialog.as_ref().is_none_or(|d| d.id != "reuseSlides") {
+        app.reuse_preview = None;
+    }
 }
 
 fn buttons(ui: &mut Ui, ok_label: &str) -> (bool, bool) {
@@ -217,6 +220,7 @@ mod language;
 mod paragraph;
 mod photo_album;
 mod preferences;
+mod reuse;
 mod size_position;
 mod slide_size;
 mod tabs;
@@ -233,6 +237,7 @@ use hyperlink::{
 };
 pub use language::selected_language;
 use preferences::restore_preferences;
+pub use reuse::ReusePreview;
 pub use zoom::parse_zoom_percent;
 
 fn seed_once(d: &mut Dialog, key: &str, val: String) {

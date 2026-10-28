@@ -137,3 +137,66 @@ fn a_failed_insert_keeps_the_dialog_open() {
     assert_eq!(h.state().dialog.as_ref().map(|d| d.id.as_str()), Some("reuseSlides"), "the dialog closed on a failed insert");
     assert_eq!(titles(&h), before);
 }
+
+/// Thumbnails drawn so far for the open picker: `(held, rendered ever)`.
+fn thumbs(h: &Harness<'_, SlideApp>) -> (usize, u64) {
+    h.state().reuse_preview.as_ref().map(|p| (p.textures.thumb_count(), p.textures.thumb_renders())).unwrap_or_default()
+}
+
+#[test]
+fn each_listed_slide_shows_a_thumbnail_of_the_picked_file() {
+    let file = Rc::new(RefCell::new(deck_bytes(&["Alpha", "Beta", "Gamma"])));
+    let mut h = harness(&file);
+    open_dialog(&mut h);
+    h.run_steps(6);
+    assert_eq!(thumbs(&h), (3, 3));
+    // Settled: later frames draw the same textures without rendering again.
+    h.run_steps(6);
+    assert_eq!(thumbs(&h), (3, 3));
+    assert!(h.query_all_by_label("No preview").next().is_none());
+}
+
+#[test]
+fn ticking_only_the_second_slide_inserts_the_second_slide() {
+    let file = Rc::new(RefCell::new(deck_bytes(&["Alpha", "Beta", "Gamma"])));
+    let mut h = harness(&file);
+    open_dialog(&mut h);
+    h.run_steps(4);
+    for i in [0, 2] {
+        h.state_mut().dialog.as_mut().unwrap().fields.insert(format!("off{i}"), "1".into());
+    }
+    h.run_steps(2);
+    press_insert(&mut h);
+    assert!(h.state().dialog.is_none());
+    assert!(h.state().reuse_preview.is_none(), "the thumbnails go with the dialog");
+    let t = titles(&h);
+    assert!(t.iter().any(|x| x == "Beta") && !t.iter().any(|x| x == "Alpha" || x == "Gamma"), "{t:?}");
+}
+
+#[test]
+fn a_slide_that_cannot_be_drawn_keeps_its_title_beside_a_placeholder() {
+    let file = Rc::new(RefCell::new(deck_bytes(&["Alpha"])));
+    let mut h = harness(&file);
+    open_dialog(&mut h);
+    if let Some(d) = h.state_mut().dialog.as_mut()
+        && let Some(a) = d.params["slides"].as_array_mut()
+    {
+        a.push(json!({"index": 9, "title": "Ghost", "hidden": false}));
+    }
+    h.run_steps(6);
+    h.get_by_label("10  Ghost");
+    assert_eq!(h.query_all_by_label("No preview").count(), 1);
+    assert_eq!(thumbs(&h), (1, 1));
+}
+
+#[test]
+fn only_the_first_200_slides_get_thumbnails_and_only_rows_in_view_render() {
+    let names: Vec<String> = (1..=205).map(|i| format!("S{i}")).collect();
+    let file = Rc::new(RefCell::new(deck_bytes(&names.iter().map(String::as_str).collect::<Vec<_>>())));
+    let mut h = harness(&file);
+    open_dialog(&mut h);
+    h.run_steps(10);
+    assert_eq!(h.query_all_by_label("No preview").count(), 5, "slides 201 to 205 are listed by title only");
+    let (_, rendered) = thumbs(&h);
+    assert!((1..=20).contains(&rendered), "rendered {rendered} of 205");
+}

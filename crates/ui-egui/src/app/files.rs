@@ -287,11 +287,13 @@ impl SlideApp {
         // Read the file once: the list shown and the slides inserted come from the same bytes, even
         // if the file changes while the dialog is open. Without a reader the path is used as is.
         let mut source = json!({});
+        let mut read = None;
         match self.services.read.as_ref().map(|r| r(&path)) {
             Some(Ok(bytes)) => {
                 let name = std::path::Path::new(&path).file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
                 source["name"] = json!(name);
                 source["data"] = json!(deckcraft_engine::cmd::base64_encode(&bytes));
+                read = Some((name, bytes));
             }
             Some(Err(e)) => {
                 self.set_status(e.to_string());
@@ -305,6 +307,8 @@ impl SlideApp {
                 let mut d = dialogs::Dialog::new("reuseSlides");
                 d.params = json!({"path": path, "source": source, "keep": keep, "slides": list["slides"]});
                 self.reuse_target = Some(self.capture_file_target());
+                // The thumbnails' copy of the file, read only once the file has proved to list.
+                self.reuse_preview = read.map(|(name, bytes)| dialogs::ReusePreview::new(&name, &bytes));
                 self.dialog = Some(d);
             }
             Err(e) => self.set_status(e.to_string()),
