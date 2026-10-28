@@ -5,7 +5,7 @@
 
 use deckcraft_model::Presentation;
 
-use super::*;
+use super::{Color32, CornerRadius, Rect, Sense, SlideApp, Stroke, Tokens, Ui, pos2, vec2};
 use crate::textures::{Textures, device_pixel_rect};
 
 /// Slides past this many are listed by title only.
