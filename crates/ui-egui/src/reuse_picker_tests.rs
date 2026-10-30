@@ -174,6 +174,21 @@ fn ticking_only_the_second_slide_inserts_the_second_slide() {
 }
 
 #[test]
+fn the_thumbnails_go_when_a_script_closes_the_dialog() {
+    let file = Rc::new(RefCell::new(deck_bytes(&["Alpha", "Beta"])));
+    let mut h = harness(&file);
+    open_dialog(&mut h);
+    h.run_steps(6);
+    assert_eq!(thumbs(&h).0, 2);
+    let (req, _rx) = crate::control::ControlRequest::new("ui.dialog.close", json!({}));
+    let ctx = h.ctx.clone();
+    assert!(matches!(crate::control::handle(h.state_mut(), &ctx, &req), crate::control::Outcome::Done(_)));
+    h.run_steps(1);
+    assert!(h.state().dialog.is_none());
+    assert!(h.state().reuse_preview.is_none(), "the parsed file and its textures are released");
+}
+
+#[test]
 fn a_slide_that_cannot_be_drawn_keeps_its_title_beside_a_placeholder() {
     let file = Rc::new(RefCell::new(deck_bytes(&["Alpha"])));
     let mut h = harness(&file);

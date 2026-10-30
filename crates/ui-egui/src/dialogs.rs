@@ -80,6 +80,16 @@ fn title(id: &str) -> &'static str {
 /// Render the active dialog, clearing it when dismissed and preserving or restoring application
 /// state as its close path requires.
 pub fn show(app: &mut SlideApp, ctx: &egui::Context) {
+    show_active(app, ctx);
+    // The Reuse Slides preview (the picked presentation and its thumbnail textures) lives only
+    // while its dialog is open, however that dialog went away: its buttons, Esc, another dialog,
+    // or `ui.dialog.close`, which clears the dialog outside this function.
+    if app.dialog.as_ref().is_none_or(|d| d.id != "reuseSlides") {
+        app.reuse_preview = None;
+    }
+}
+
+fn show_active(app: &mut SlideApp, ctx: &egui::Context) {
     let Some(mut d) = app.dialog.take() else { return };
     let mut open = true;
     let mut close = false;
@@ -123,9 +133,6 @@ pub fn show(app: &mut SlideApp, ctx: &egui::Context) {
         let mut back = Dialog::new(id);
         back.params = ret;
         app.dialog = Some(back);
-    }
-    if app.dialog.as_ref().is_none_or(|d| d.id != "reuseSlides") {
-        app.reuse_preview = None;
     }
 }
 
