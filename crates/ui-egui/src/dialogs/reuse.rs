@@ -11,6 +11,8 @@ use crate::textures::{Textures, device_pixel_rect};
 /// Slides past this many are listed by title only.
 pub const REUSE_THUMBS: usize = 200;
 const THUMB_W: f32 = 96.0;
+/// The width a slide's title wraps at beside its thumbnail.
+pub const TITLE_W: f32 = 320.0;
 
 /// The picked file, read once when the picker opens, and its own thumbnail cache; dropped with
 /// the dialog.

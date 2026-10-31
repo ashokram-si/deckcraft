@@ -244,7 +244,7 @@ use hyperlink::{
 };
 pub use language::selected_language;
 use preferences::restore_preferences;
-pub use reuse::ReusePreview;
+pub use reuse::{ReusePreview, TITLE_W as REUSE_TITLE_W};
 pub use zoom::parse_zoom_percent;
 
 fn seed_once(d: &mut Dialog, key: &str, val: String) {

@@ -664,15 +664,21 @@ fn dlg_reuse_slides(app: &mut SlideApp, ui: &mut Ui, d: &mut Dialog) -> bool {
         for (i, title) in &slides {
             let mut on = !off(d, *i);
             let label = if title.trim().is_empty() { format!("{}  (no title)", i + 1) } else { format!("{}  {}", i + 1, title.trim()) };
-            ui.horizontal(|ui| {
+            ui.horizontal_top(|ui| {
                 need_more |= super::reuse::reuse_thumb(app, ui, *i, &mut budget);
-                if ui.checkbox(&mut on, label).changed() {
-                    if on {
-                        d.fields.remove(&format!("off{i}"));
-                    } else {
-                        d.fields.insert(format!("off{i}"), "1".into());
+                // A long title wraps beside its thumbnail instead of widening the dialog past the
+                // list, where the scroll area would clip it.
+                ui.scope(|ui| {
+                    ui.set_max_width(super::reuse::TITLE_W);
+                    ui.style_mut().wrap_mode = Some(egui::TextWrapMode::Wrap);
+                    if ui.checkbox(&mut on, label).changed() {
+                        if on {
+                            d.fields.remove(&format!("off{i}"));
+                        } else {
+                            d.fields.insert(format!("off{i}"), "1".into());
+                        }
                     }
-                }
+                });
             });
         }
     });

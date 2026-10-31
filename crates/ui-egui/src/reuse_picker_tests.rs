@@ -251,3 +251,14 @@ fn a_host_without_a_reader_lists_previews_and_inserts_the_same_bytes() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
+#[test]
+fn a_long_title_wraps_beside_its_thumbnail() {
+    let long = "A very long slide title that keeps going ".repeat(6);
+    let file = Rc::new(RefCell::new(deck_bytes(&[long.trim()])));
+    let mut h = harness(&file);
+    open_dialog(&mut h);
+    h.run_steps(6);
+    let row = h.get_by_label_contains("A very long slide title").rect();
+    assert!(row.width() <= crate::dialogs::REUSE_TITLE_W + 1.0, "the title is {} wide", row.width());
+    assert!(row.height() > 2.0 * 14.0, "the title wraps onto more lines: {}", row.height());
+}
