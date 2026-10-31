@@ -215,3 +215,39 @@ fn only_the_first_200_slides_get_thumbnails_and_only_rows_in_view_render() {
     let (_, rendered) = thumbs(&h);
     assert!((1..=20).contains(&rendered), "rendered {rendered} of 205");
 }
+
+/// An app whose open dialog picks `path` and that has no reader of its own (the engine reads it).
+fn path_only_harness(path: &str) -> Harness<'static, SlideApp> {
+    let mut s = Session::with_new();
+    s.execute("slide.new", &json!({"layout": "blank"})).unwrap();
+    let picked = path.to_string();
+    let services = Services { pick_open: Some(Box::new(move |_| Some(picked.clone()))), ..Services::default() };
+    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).with_step_dt(1.0 / 60.0).build_ui_state(
+        |ui, app: &mut SlideApp| {
+            app.logic(ui.ctx());
+            app.ui(ui);
+        },
+        SlideApp::new(s, services),
+    );
+    h.run_steps(3);
+    h
+}
+
+#[test]
+fn a_host_without_a_reader_lists_previews_and_inserts_the_same_bytes() {
+    let dir = std::env::temp_dir().join(format!("deckcraft-reuse-path-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let path = dir.join("src.deckcraft");
+    std::fs::write(&path, deck_bytes(&["Alpha", "Beta"])).unwrap();
+    let mut h = path_only_harness(path.to_str().unwrap());
+    open_dialog(&mut h);
+    h.run_steps(6);
+    assert_eq!(thumbs(&h).0, 2, "each listed slide has a thumbnail");
+    // The file changes after it was listed: what is inserted is still what was listed.
+    std::fs::write(&path, deck_bytes(&["Changed"])).unwrap();
+    press_insert(&mut h);
+    let t = titles(&h);
+    assert!(t.ends_with(&["Alpha".to_string(), "Beta".to_string()]) && !t.contains(&"Changed".to_string()), "{t:?}");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
